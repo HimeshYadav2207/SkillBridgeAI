@@ -1,0 +1,6 @@
+{"name":"Arjun Mehta","role":"Senior SDE at Google","skills":["DSA","System Design","ML"],"rating":4.9,"sessions":234,"avatar":"A","available":true,"_id":"1DJdFEj73iI9nP7t"}
+{"name":"Pooja Nair","role":"Product Manager at Flipkart","skills":["Product Strategy","Analytics","UX"],"rating":4.9,"sessions":312,"avatar":"P","available":true,"_id":"9EcBtqNfVXcky0I5"}
+{"name":"Rahul Gupta","role":"Cybersecurity Expert at CERT-In","skills":["Network Security","Pen Testing","Compliance"],"rating":4.6,"sessions":98,"avatar":"R","available":true,"_id":"BLinzds5GxjtLayc"}
+{"name":"Sneha Iyer","role":"Data Scientist at Microsoft","skills":["Python","ML","Statistics"],"rating":4.8,"sessions":189,"avatar":"S","available":true,"_id":"E7WZQmArRzC49h91"}
+{"name":"Divya Krishnan","role":"AI Researcher at IISc","skills":["Deep Learning","NLP","Computer Vision"],"rating":5,"sessions":67,"avatar":"D","available":false,"_id":"Ia6Dcz4tmUGsErAd"}
+{"name":"Vikram Rao","role":"DevOps Lead at Amazon","skills":["AWS","Docker","CI/CD"],"rating":4.7,"sessions":156,"avatar":"V","available":false,"_id":"Ol7CprwdbLfwK9LZ"}
