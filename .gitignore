@@ -4,13 +4,21 @@ node_modules/
 .pnp.js
 
 # Backend
+backend/data/
+backend/.env
 
 
 # Frontend build
-
+frontend/dist/
+frontend/.env.local
+frontend/.env.*.local
 
 # Environment files
-
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Logs
 logs/
