@@ -118,6 +118,9 @@ function Candidates() {
   const [loading, setLoading] = useState(true)
   const [status, setStatus] = useState({})
   const [expanded, setExpanded] = useState(null)
+  const [minScore, setMinScore] = useState(0)
+  const [filterStatus, setFilterStatus] = useState('all')
+  const [skillFilter, setSkillFilter] = useState('')
 
   useEffect(() => {
     axios.get('/api/recruiters/candidates')
@@ -143,13 +146,70 @@ function Candidates() {
     </div>
   )
 
+    const filtered = candidates.filter(c => {
+    const matchScore = c.skillScore >= minScore
+    const matchStatus = filterStatus === 'all' || (status[c.applicationId] || c.status) === filterStatus
+    const matchSkill = !skillFilter || (c.skills || []).some(s => s.toLowerCase().includes(skillFilter.toLowerCase()))
+    return matchScore && matchStatus && matchSkill
+  })
+
   return (
     <div className="space-y-4">
+      {/* FILTERS */}
+      <div className="card p-4 space-y-3">
+        <h4 className="font-bold text-gray-900 text-sm">🔍 Filter Candidates</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label className="text-xs font-semibold text-gray-600 block mb-1">Min Skill Score: {minScore}+</label>
+            <input type="range" min="0" max="100" step="10" value={minScore}
+              onChange={e => setMinScore(Number(e.target.value))}
+              className="w-full accent-primary" />
+            <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
+              <span>0</span><span>50</span><span>100</span>
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 block mb-1">Filter by Status</label>
+            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary">
+              <option value="all">All Status</option>
+              <option value="pending">Applied</option>
+              <option value="shortlisted">Shortlisted</option>
+              <option value="interview">Interview</option>
+              <option value="hired">Hired</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 block mb-1">Filter by Skill</label>
+            <input value={skillFilter} onChange={e => setSkillFilter(e.target.value)}
+              placeholder="e.g. React, Python..." 
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary" />
+          </div>
+        </div>
+        <div className="flex items-center justify-between pt-1">
+          <span className="text-xs text-gray-500">{filtered.length} of {candidates.length} candidates match</span>
+          <button onClick={() => { setMinScore(0); setFilterStatus('all'); setSkillFilter('') }}
+            className="text-xs text-primary hover:underline font-semibold">Clear Filters</button>
+        </div>
+      </div>
+
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-gray-900">Applicants</h3>
-        <span className="badge bg-blue-50 text-blue-700">{candidates.length} total</span>
+        <div className="flex items-center gap-2">
+          <button onClick={() => {
+            filtered.forEach(c => {
+              if ((status[c.applicationId] || c.status) === 'pending') {
+                updateStatus(c.applicationId, 'shortlisted')
+              }
+            })
+          }} className="text-xs text-amber-600 font-bold hover:underline">
+            ⭐ Shortlist All Matching
+          </button>
+          <span className="badge bg-blue-50 text-blue-700">{filtered.length} shown</span>
+        </div>
       </div>
-      {candidates.map(c => {
+      {filtered.map(c => {
         const currentStatus = status[c.applicationId] || c.status
         const isExpanded = expanded === c.applicationId
         return (

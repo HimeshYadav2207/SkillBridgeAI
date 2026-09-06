@@ -20,9 +20,29 @@ export default function Internships() {
   async function fetchJobs(query = '') {
     setLoading(true)
     try {
-      const r = await axios.get(`/api/students/jobs-feed${query ? `?q=${encodeURIComponent(query)}` : ''}`)
-      setListings(r.data.jobs || [])
-      setApiSource(r.data.source || 'demo')
+      const profileRes = await axios.get('/api/students/dashboard')
+      const skillScore = profileRes.data.stats?.skillScore || 30
+      const interests = profileRes.data.profile?.interests || []
+      const [feedRes, dbRes] = await Promise.all([
+        axios.get(`/api/students/jobs-feed${query ? `?q=${encodeURIComponent(query)}` : interests.length > 0 ? `?q=${encodeURIComponent(interests[0])}` : ''}`),
+        axios.get('/api/students/internships'),
+      ])
+      const feedJobs = feedRes.data.jobs || []
+      const dbInternships = (dbRes.data.internships || []).map(i => ({
+        _id: i._id,
+        title: i.title,
+        company: i.company,
+        location: i.location,
+        compensation: i.stipend || 'Competitive',
+        duration: i.duration || 'Permanent',
+        skills: i.skills || [],
+       match: Math.min(95, Math.floor(skillScore + (i._id.charCodeAt(0) % 10) - 5)),
+        logo: i.logo || '💼',
+        type: i.type || 'Full-time',
+        category: 'internship',
+      }))
+      setListings([...dbInternships, ...feedJobs])
+      setApiSource(feedRes.data.source || 'demo')
     } catch {
       setListings([])
     }
@@ -51,13 +71,11 @@ export default function Internships() {
 
   return (
     <div className="space-y-6">
-      {/* API SOURCE BANNER */}
       <div className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-medium ${apiSource === 'adzuna' ? 'bg-emerald-50 border border-emerald-200 text-emerald-700' : 'bg-blue-50 border border-blue-200 text-blue-700'}`}>
         <span>{apiSource === 'adzuna' ? '🟢 Live data from Adzuna Jobs API' : '🔵 Smart demo data — add Adzuna API key in backend/.env for live Indian job listings'}</span>
         {apiSource === 'adzuna' && <span className="ml-auto font-bold">{listings.length} live jobs</span>}
       </div>
 
-      {/* CATEGORY TABS */}
       <div className="flex gap-2 flex-wrap">
         {[
           { key: 'all', label: `All (${listings.length})` },
@@ -71,7 +89,6 @@ export default function Internships() {
         ))}
       </div>
 
-      {/* SMART SEARCH */}
       <div className="card p-4">
         <div className="flex flex-col md:flex-row gap-3">
           <div className="flex-1 flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
@@ -96,7 +113,6 @@ export default function Internships() {
         </div>
       </div>
 
-      {/* COUNT */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-500">{filtered.length} {categoryFilter === 'job' ? 'jobs' : categoryFilter === 'internship' ? 'internships' : 'listings'} found</p>
         <div className="flex items-center gap-2">
@@ -105,7 +121,6 @@ export default function Internships() {
         </div>
       </div>
 
-      {/* LOADING */}
       {loading && (
         <div className="card p-12 text-center">
           <div className="text-4xl mb-3 animate-spin">⚙️</div>
@@ -113,7 +128,6 @@ export default function Internships() {
         </div>
       )}
 
-      {/* LISTINGS */}
       {!loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filtered.map(i => (

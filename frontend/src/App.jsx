@@ -7,9 +7,12 @@ import Login from './screens/Login'
 import Register from './screens/Register'
 import Dashboard from './screens/Dashboard'
 import Assessment from './screens/Assessment'
+import AptitudeTest from './screens/AptitudeTest'
 import Internships from './screens/Internships'
 import Mentors from './screens/Mentors'
 import Portfolio from './screens/Portfolio'
+import InternshipTracker from './screens/InternshipTracker'
+import Resources from './screens/Resources'
 import Recruiter from './screens/Recruiter'
 import Faculty from './screens/Faculty'
 import Govt from './screens/Govt'
@@ -32,7 +35,6 @@ function RequireAuth({ children, roles }) {
 
 function RequireGuest({ children }) {
   const { user, loading } = useAuth()
-  // Don't block render while auth loads — show the page, redirect after
   if (loading) return children
   if (user) {
     const roleHome = { recruiter: '/recruiter', faculty: '/faculty', institution: '/institution' }
@@ -61,6 +63,11 @@ export default function App() {
             <AppShell><Assessment /></AppShell>
           </RequireAuth>
         } />
+        <Route path="/aptitude" element={
+          <RequireAuth roles={['student']}>
+    <AppShell><AptitudeTest /></AppShell>
+  </RequireAuth>
+        } />
         <Route path="/internships" element={
           <RequireAuth roles={['student']}>
             <AppShell><Internships /></AppShell>
@@ -74,6 +81,16 @@ export default function App() {
         <Route path="/portfolio" element={
           <RequireAuth roles={['student']}>
             <AppShell><Portfolio /></AppShell>
+          </RequireAuth>
+        } />
+        <Route path="/tracker" element={
+  <RequireAuth roles={['student']}>
+    <AppShell><InternshipTracker /></AppShell>
+  </RequireAuth>
+} />
+        <Route path="/resources" element={
+          <RequireAuth roles={['student']}>
+            <AppShell><Resources /></AppShell>
           </RequireAuth>
         } />
 

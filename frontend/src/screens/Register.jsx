@@ -12,7 +12,7 @@ const roles = [
 export default function Register() {
   const { register } = useAuth()
   const navigate = useNavigate()
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'student', college: '', company: '', gstin: '', companyReg: '' })
+  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'student', college: '', company: '', companyReg: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -73,6 +73,7 @@ export default function Register() {
                 <input value={form.college} onChange={f('college')} placeholder="e.g. IIT Bombay • B.Tech CSE" className="input" />
               </div>
             )}
+
             {form.role === 'recruiter' && (
               <div className="space-y-3">
                 <div>
@@ -80,16 +81,8 @@ export default function Register() {
                   <input value={form.company} onChange={f('company')} placeholder="e.g. Google India" className="input" required />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 block mb-1.5 font-medium">GSTIN Number <span className="text-red-400">*</span></label>
-                  <input value={form.gstin} onChange={f('gstin')} placeholder="e.g. 27AAPFU0939F1ZV" className="input" maxLength={15} style={{textTransform:'uppercase'}} />
-                  <p className="text-[10px] text-gray-400 mt-1">15-digit GST Identification Number for company verification</p>
-                </div>
-                <div>
                   <label className="text-xs text-gray-500 block mb-1.5 font-medium">Company Registration No. <span className="text-gray-400">(optional)</span></label>
                   <input value={form.companyReg} onChange={f('companyReg')} placeholder="e.g. U72200MH2004PTC144786 or CIN" className="input" />
-                </div>
-                <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-700">
-                  ⚠️ Your account will be reviewed within 24 hours after GSTIN verification. You can post jobs after approval.
                 </div>
               </div>
             )}

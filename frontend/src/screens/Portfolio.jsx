@@ -28,6 +28,40 @@ function Field({ label, children }) {
 }
 const inp = 'w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary'
 
+// ── Platform detection ────────────────────────────────────────────────────────
+const PLATFORMS = {
+  coursera:   { name: 'Coursera',   color: 'bg-blue-600',   light: 'bg-blue-50 text-blue-700 border-blue-200',      domains: ['coursera.org'] },
+  nptel:      { name: 'NPTEL',      color: 'bg-orange-500', light: 'bg-orange-50 text-orange-700 border-orange-200', domains: ['nptel.ac.in', 'swayam.gov.in'] },
+  aws:        { name: 'AWS',        color: 'bg-yellow-500', light: 'bg-yellow-50 text-yellow-700 border-yellow-200', domains: ['aws.amazon.com', 'amazon.com'] },
+  google:     { name: 'Google',     color: 'bg-emerald-600',light: 'bg-emerald-50 text-emerald-700 border-emerald-200', domains: ['google.com'] },
+  microsoft:  { name: 'Microsoft',  color: 'bg-blue-700',   light: 'bg-blue-50 text-blue-700 border-blue-200',      domains: ['microsoft.com', 'learn.microsoft.com'] },
+  hackerrank: { name: 'HackerRank', color: 'bg-green-600',  light: 'bg-green-50 text-green-700 border-green-200',   domains: ['hackerrank.com'] },
+  udemy:      { name: 'Udemy',      color: 'bg-purple-600', light: 'bg-purple-50 text-purple-700 border-purple-200', domains: ['udemy.com'] },
+  linkedin:   { name: 'LinkedIn',   color: 'bg-blue-800',   light: 'bg-blue-50 text-blue-800 border-blue-200',      domains: ['linkedin.com'] },
+  github:     { name: 'GitHub',     color: 'bg-gray-800',   light: 'bg-gray-50 text-gray-700 border-gray-200',      domains: ['github.com'] },
+}
+
+function detectPlatform(url, issuer) {
+  if (url) {
+    for (const [key, p] of Object.entries(PLATFORMS)) {
+      if (p.domains.some(d => url.includes(d))) return key
+    }
+  }
+  if (issuer) {
+    const low = issuer.toLowerCase()
+    for (const [key, p] of Object.entries(PLATFORMS)) {
+      if (low.includes(key) || low.includes(p.name.toLowerCase())) return key
+    }
+  }
+  return null
+}
+
+function getVerificationStatus(url, platformKey) {
+  if (!url) return { status: 'self', label: 'Self-reported', color: 'bg-gray-100 text-gray-500' }
+  if (platformKey) return { status: 'verified', label: '✅ Verified', color: 'bg-emerald-50 text-emerald-700 border border-emerald-200' }
+  return { status: 'url', label: '🔗 URL Provided', color: 'bg-blue-50 text-blue-600 border border-blue-200' }
+}
+
 // ── Add Project Modal ─────────────────────────────────────────────────────────
 function AddProjectModal({ onClose, onSave }) {
   const [form, setForm] = useState({ title: '', description: '', tech: '', link: '' })
@@ -61,25 +95,48 @@ function AddProjectModal({ onClose, onSave }) {
 
 // ── Add Certificate Modal ────────────────────────────────────────────────────
 function AddCertModal({ onClose, onSave }) {
-  const [form, setForm] = useState({ title: '', issuer: '', date: '', badge: '🏅', link: '' })
+  const [form, setForm] = useState({ title: '', issuer: '', date: '', badge: '🏅', link: '', skills: '' })
   const [saving, setSaving] = useState(false)
   const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }))
+
+  const platformKey = detectPlatform(form.link, form.issuer)
+  const platform = platformKey ? PLATFORMS[platformKey] : null
+  const verification = getVerificationStatus(form.link, platformKey)
+
   async function submit() {
     if (!form.title.trim()) return
     setSaving(true)
     try {
-      await onSave({ type: 'certificate', ...form })
+      await onSave({
+        type: 'certificate', ...form,
+        skills: form.skills.split(',').map(s => s.trim()).filter(Boolean),
+        platformKey, verified: verification.status === 'verified'
+      })
       onClose()
     } finally { setSaving(false) }
   }
+
   const badges = ['🏅', '⚛', '🐍', '🗃', '☁', '🔐', '📊', '🤖', '🌐']
   return (
     <Modal title="Add Certificate" onClose={onClose}>
       <div className="space-y-3">
-        <Field label="Certificate Name *"><input className={inp} value={form.title} onChange={set('title')} placeholder="e.g. AWS Cloud Practitioner" /></Field>
-        <Field label="Issuing Organisation"><input className={inp} value={form.issuer} onChange={set('issuer')} placeholder="e.g. Amazon, Coursera, HackerRank" /></Field>
-        <Field label="Date Earned"><input className={inp} type="month" value={form.date} onChange={set('date')} /></Field>
-        <Field label="Certificate URL"><input className={inp} value={form.link} onChange={set('link')} placeholder="https://..." /></Field>
+        <Field label="Certificate Name *">
+          <input className={inp} value={form.title} onChange={set('title')} placeholder="e.g. AWS Cloud Practitioner" />
+        </Field>
+        <Field label="Issuing Organisation">
+          <input className={inp} value={form.issuer} onChange={set('issuer')} placeholder="e.g. Amazon, Coursera, HackerRank" />
+          {platform && <p className="text-xs text-emerald-600 mt-1">✅ Recognised platform detected: {platform.name}</p>}
+        </Field>
+        <Field label="Certificate URL">
+          <input className={inp} value={form.link} onChange={set('link')} placeholder="https://..." />
+          <div className={`mt-1 inline-block text-[10px] font-bold px-2 py-0.5 rounded-full ${verification.color}`}>{verification.label}</div>
+        </Field>
+        <Field label="Skills Validated (comma separated)">
+          <input className={inp} value={form.skills} onChange={set('skills')} placeholder="e.g. React, JavaScript, CSS" />
+        </Field>
+        <Field label="Date Earned">
+          <input className={inp} type="month" value={form.date} onChange={set('date')} />
+        </Field>
         <Field label="Badge Icon">
           <div className="flex gap-2 flex-wrap">
             {badges.map(b => (
@@ -148,7 +205,7 @@ export default function Portfolio() {
   const [activeTab, setActiveTab] = useState('overview')
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
-  const [modal, setModal] = useState(null) // 'project' | 'certificate' | 'experience'
+  const [modal, setModal] = useState(null)
   const [deleting, setDeleting] = useState(null)
 
   useEffect(() => {
@@ -174,10 +231,8 @@ export default function Portfolio() {
   const projects = items.filter(i => i.type === 'project')
   const certs = items.filter(i => i.type === 'certificate')
   const exp = items.filter(i => i.type === 'experience')
-
   const TABS = ['overview', 'projects', 'certificates', 'experience']
 
-  // Profile info
   const profileName = user?.name || 'Student'
   const profileCollege = user?.college || ''
   const profileBio = user?.bio || 'Complete your profile to add a bio.'
@@ -186,7 +241,6 @@ export default function Portfolio() {
   const profileGithub = user?.github || ''
   const profileLinkedin = user?.linkedin || ''
 
-  // Compute profile completion %
   const filled = [user?.name, user?.college, user?.bio, user?.github, user?.linkedin, projects.length > 0, certs.length > 0].filter(Boolean).length
   const completion = Math.round((filled / 7) * 100)
 
@@ -317,26 +371,56 @@ export default function Portfolio() {
           {certs.length === 0
             ? <EmptyState icon="🏅" label="No certificates yet" sub="Add certifications from Coursera, HackerRank, AWS, Google, and more." onAdd={() => setModal('certificate')} />
             : <>
-              {certs.map(c => (
-                <div key={c._id} className="card p-4 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-2xl shrink-0">{c.badge}</div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-gray-900 text-sm">{c.title}</h3>
-                    <p className="text-xs text-gray-500">{c.issuer}{c.date ? ` · ${c.date}` : ''}</p>
+              {certs.map(c => {
+                const pKey = c.platformKey || detectPlatform(c.link, c.issuer)
+                const platform = pKey ? PLATFORMS[pKey] : null
+                const verification = getVerificationStatus(c.link, pKey)
+                return (
+                  <div key={c._id} className="card p-5">
+                    <div className="flex items-start gap-4">
+                      <div className={`w-14 h-14 rounded-2xl ${platform ? platform.color : 'bg-amber-100'} flex items-center justify-center text-2xl shrink-0 shadow-sm`}>
+                        {c.badge}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h3 className="font-bold text-gray-900">{c.title}</h3>
+                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                              {platform && (
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${platform.light}`}>
+                                  {platform.name}
+                                </span>
+                              )}
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${verification.color}`}>
+                                {verification.label}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">{c.issuer}{c.date ? ` · ${c.date}` : ''}</p>
+                          </div>
+                          <button onClick={() => removeItem(c._id)} disabled={deleting === c._id}
+                            className="text-gray-300 hover:text-red-400 transition-colors text-lg leading-none shrink-0">
+                            {deleting === c._id ? '...' : '×'}
+                          </button>
+                        </div>
+                        {c.skills?.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {c.skills.map(s => <span key={s} className="badge bg-blue-50 text-blue-700 text-[10px]">✓ {s}</span>)}
+                          </div>
+                        )}
+                        {c.link && (
+                          <a href={c.link.startsWith('http') ? c.link : `https://${c.link}`} target="_blank" rel="noreferrer"
+                            className="inline-block mt-2 text-xs text-primary hover:underline font-semibold">
+                            🔗 View Certificate →
+                          </a>
+                        )}
+                        {!c.link && (
+                          <p className="text-[10px] text-gray-400 mt-2">💡 Add a certificate URL to get verified status</p>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {c.link && (
-                      <a href={c.link.startsWith('http') ? c.link : `https://${c.link}`} target="_blank" rel="noreferrer"
-                        className="text-xs text-primary hover:underline">View</a>
-                    )}
-                    <span className="badge bg-emerald-50 text-emerald-600 text-[10px]">Verified</span>
-                    <button onClick={() => removeItem(c._id)} disabled={deleting === c._id}
-                      className="text-gray-300 hover:text-red-400 transition-colors text-lg leading-none ml-1" title="Remove">
-                      {deleting === c._id ? '...' : '×'}
-                    </button>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
               <button onClick={() => setModal('certificate')} className="w-full card p-4 text-center text-primary font-semibold text-sm hover:bg-blue-50 transition-colors">
                 + Add Certificate
               </button>

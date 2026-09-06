@@ -8,9 +8,12 @@ const NAV = {
   student: [
     { to: '/dashboard', icon: '⊞', label: 'Dashboard' },
     { to: '/assessment', icon: '📝', label: 'Skill Assessment' },
+    { to: '/aptitude', icon: '🎯', label: 'Aptitude Test' },
     { to: '/internships', icon: '💼', label: 'Internships' },
     { to: '/mentors', icon: '🧑‍🏫', label: 'Find Mentors' },
     { to: '/portfolio', icon: '🗂', label: 'My Portfolio' },
+    { to: '/tracker', icon: '📅', label: 'Internship Tracker' },
+    { to: '/resources', icon: '📚', label: 'Learning Resources' },
   ],
   recruiter: [
     { to: '/recruiter', icon: '⊞', label: 'Dashboard' },
@@ -42,11 +45,11 @@ const ACCENT = {
 
 const TITLES = {
   '/dashboard': 'Dashboard', '/assessment': 'Skill Assessment', '/internships': 'Internships',
-  '/mentors': 'Find Mentors', '/portfolio': 'My Portfolio',
+  '/mentors': 'Find Mentors', '/portfolio': 'My Portfolio', '/resources': 'Learning Resources', '/aptitude': 'Aptitude Test',
   '/recruiter': 'Recruiter Dashboard', '/recruiter/candidates': 'Candidates',
   '/recruiter/jobs': 'Job Postings', '/recruiter/post': 'Post a Job', '/recruiter/analytics': 'Analytics',
-  '/faculty': 'Faculty Dashboard', '/faculty/students': 'My Students', '/faculty/skills': 'Skill Trends', '/faculty/curriculum': 'Curriculum',
-  '/institution': 'Institution Dashboard', '/institution/placements': 'Placements', '/institution/analytics': 'Analytics', '/institution/naac': 'NAAC/NBA',
+  '/faculty': 'Faculty Dashboard', '/faculty/students': 'My Students', '/faculty/skills': 'Skill Trends', '/faculty/curriculum': 'Curriculum', '/faculty/fdp': 'FDP & Opportunities',
+  '/institution': 'Institution Dashboard', '/institution/placements': 'Placements','/tracker': 'Internship Tracker', '/institution/analytics': 'Analytics', '/institution/naac': 'NAAC/NBA',
 }
 
 // ── Edit Profile Modal ───────────────────────────────────────────────────────

@@ -2,53 +2,61 @@ import { useState } from 'react'
 import axios from 'axios'
 
 const questions = [
-  // JavaScript
+  // JavaScript (2)
   { id: 1,  skill: 'JavaScript', q: 'What is the output of typeof null in JavaScript?', opts: ['null', 'undefined', 'object', 'string'], ans: 2 },
-  { id: 2,  skill: 'JavaScript', q: 'Which method removes the last element from an array?', opts: ['shift()', 'pop()', 'splice()', 'slice()'], ans: 1 },
-  { id: 3,  skill: 'JavaScript', q: 'What does the "===" operator check in JavaScript?', opts: ['Value only', 'Type only', 'Value and type', 'Reference only'], ans: 2 },
-  { id: 4,  skill: 'JavaScript', q: 'Which of the following is NOT a JavaScript data type?', opts: ['Boolean', 'Float', 'Symbol', 'BigInt'], ans: 1 },
-  { id: 5,  skill: 'JavaScript', q: 'What does "async/await" help with in JavaScript?', opts: ['CSS animations', 'Handling asynchronous code', 'DOM manipulation', 'Memory management'], ans: 1 },
-  { id: 6,  skill: 'JavaScript', q: 'What is a closure in JavaScript?', opts: ['A function with no return value', 'A function that remembers its outer scope', 'A loop that never ends', 'A class method'], ans: 1 },
+  { id: 2,  skill: 'JavaScript', q: 'What is a closure in JavaScript?', opts: ['A function with no return value', 'A function that remembers its outer scope', 'A loop that never ends', 'A class method'], ans: 1 },
 
-  // React
-  { id: 7,  skill: 'React', q: 'Which hook is used for side effects in React?', opts: ['useState', 'useEffect', 'useRef', 'useMemo'], ans: 1 },
-  { id: 8,  skill: 'React', q: 'What does JSX stand for?', opts: ['JavaScript XML', 'Java Syntax Extension', 'JSON XML', 'JS Extension'], ans: 0 },
-  { id: 9,  skill: 'React', q: 'What is the correct way to update state in React?', opts: ['this.state.x = y', 'setState or useState setter', 'state.update()', 'mutate(state)'], ans: 1 },
-  { id: 10, skill: 'React', q: 'What does the key prop do in a list rendering?', opts: ['Styles the element', 'Helps React identify changed items', 'Enables animations', 'Sets focus'], ans: 1 },
-  { id: 11, skill: 'React', q: 'Which hook returns a mutable ref object in React?', opts: ['useState', 'useEffect', 'useRef', 'useCallback'], ans: 2 },
+  // React (2)
+  { id: 3,  skill: 'React', q: 'What does JSX stand for?', opts: ['JavaScript XML', 'Java Syntax Extension', 'JSON XML', 'JS Extension'], ans: 0 },
+  { id: 4,  skill: 'React', q: 'What does the key prop do in list rendering?', opts: ['Styles the element', 'Helps React identify changed items', 'Enables animations', 'Sets focus'], ans: 1 },
 
-  // Python
-  { id: 12, skill: 'Python', q: 'Which of the following is a mutable data type in Python?', opts: ['tuple', 'string', 'list', 'int'], ans: 2 },
-  { id: 13, skill: 'Python', q: 'What keyword is used to define a function in Python?', opts: ['function', 'def', 'fn', 'func'], ans: 1 },
-  { id: 14, skill: 'Python', q: 'What is the output of len("SkillBridge")?', opts: ['10', '11', '12', '9'], ans: 1 },
-  { id: 15, skill: 'Python', q: 'Which Python library is mainly used for data analysis?', opts: ['NumPy', 'Pandas', 'Matplotlib', 'Scikit-learn'], ans: 1 },
-  { id: 16, skill: 'Python', q: 'What does the "self" keyword represent in a Python class?', opts: ['The class itself', 'The current instance', 'The parent class', 'A global variable'], ans: 1 },
-  { id: 17, skill: 'Python', q: 'Which of these is used to handle exceptions in Python?', opts: ['catch-finally', 'try-except', 'if-else', 'handle-error'], ans: 1 },
+  // Python (2)
+  { id: 5,  skill: 'Python', q: 'Which of the following is a mutable data type in Python?', opts: ['tuple', 'string', 'list', 'int'], ans: 2 },
+  { id: 6,  skill: 'Python', q: 'What does the "self" keyword represent in a Python class?', opts: ['The class itself', 'The current instance', 'The parent class', 'A global variable'], ans: 1 },
 
-  // SQL
-  { id: 18, skill: 'SQL', q: 'Which SQL clause is used to filter results?', opts: ['ORDER BY', 'GROUP BY', 'WHERE', 'HAVING'], ans: 2 },
-  { id: 19, skill: 'SQL', q: 'Which JOIN returns rows that have matching values in both tables?', opts: ['LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN', 'FULL JOIN'], ans: 2 },
-  { id: 20, skill: 'SQL', q: 'What does the DISTINCT keyword do in SQL?', opts: ['Removes duplicates', 'Sorts results', 'Filters nulls', 'Groups rows'], ans: 0 },
-  { id: 21, skill: 'SQL', q: 'Which function returns the number of rows in SQL?', opts: ['SUM()', 'MAX()', 'COUNT()', 'AVG()'], ans: 2 },
-  { id: 22, skill: 'SQL', q: 'Which SQL statement is used to add new data into a table?', opts: ['UPDATE', 'INSERT INTO', 'ALTER', 'ADD ROW'], ans: 1 },
+  // SQL (2)
+  { id: 7,  skill: 'SQL', q: 'Which SQL clause is used to filter results?', opts: ['ORDER BY', 'GROUP BY', 'WHERE', 'HAVING'], ans: 2 },
+  { id: 8,  skill: 'SQL', q: 'What does the DISTINCT keyword do in SQL?', opts: ['Removes duplicates', 'Sorts results', 'Filters nulls', 'Groups rows'], ans: 0 },
 
-  // DSA
-  { id: 23, skill: 'DSA', q: 'What is the time complexity of binary search?', opts: ['O(n)', 'O(n²)', 'O(log n)', 'O(1)'], ans: 2 },
-  { id: 24, skill: 'DSA', q: 'Which data structure follows LIFO order?', opts: ['Queue', 'Stack', 'Linked List', 'Tree'], ans: 1 },
-  { id: 25, skill: 'DSA', q: 'What is the worst-case time complexity of quicksort?', opts: ['O(n log n)', 'O(n)', 'O(n²)', 'O(log n)'], ans: 2 },
-  { id: 26, skill: 'DSA', q: 'Which algorithm is used to find the shortest path in a weighted graph?', opts: ["Kruskal's", "Prim's", "Dijkstra's", 'DFS'], ans: 2 },
-  { id: 27, skill: 'DSA', q: 'What is the space complexity of merge sort?', opts: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'], ans: 2 },
+  // DSA (2)
+  { id: 9,  skill: 'DSA', q: 'What is the time complexity of binary search?', opts: ['O(n)', 'O(n²)', 'O(log n)', 'O(1)'], ans: 2 },
+  { id: 10, skill: 'DSA', q: 'Which data structure follows LIFO order?', opts: ['Queue', 'Linked List', 'Tree', 'Stack'], ans: 3 },
 
-  // System Design
-  { id: 28, skill: 'System Design', q: 'What does CDN stand for?', opts: ['Content Delivery Network', 'Central Data Node', 'Cloud Data Network', 'Content Distribution Node'], ans: 0 },
-  { id: 29, skill: 'System Design', q: 'Which technique is used to distribute incoming network traffic across multiple servers?', opts: ['Caching', 'Load Balancing', 'Sharding', 'Replication'], ans: 1 },
-  { id: 30, skill: 'System Design', q: 'What is horizontal scaling?', opts: ['Upgrading existing hardware', 'Adding more machines to handle load', 'Optimizing code', 'Compressing data'], ans: 1 },
+  // System Design (2)
+  { id: 11, skill: 'System Design', q: 'What does CDN stand for?', opts: ['Central Data Node', 'Cloud Data Network', 'Content Delivery Network', 'Content Distribution Node'], ans: 2 },
+  { id: 12, skill: 'System Design', q: 'Which technique distributes incoming traffic across multiple servers?', opts: ['Load Balancing', 'Caching', 'Sharding', 'Replication'], ans: 0 },
+
+  // Communication (2)
+  { id: 13, skill: 'Communication', q: 'During a meeting your explanation is confusing teammates. What do you do?', opts: ['Continue the same way', 'Tell them to figure it out', 'Skip the topic entirely', 'Stop, ask what is unclear, and try a simpler explanation'], ans: 3 },
+  { id: 14, skill: 'Communication', q: 'You receive critical feedback from your manager. How do you respond?', opts: ['Thank them, ask clarifying questions, and use feedback to improve', 'Defend your work and explain why you were right', 'Stay quiet and avoid the topic', 'Complain to teammates about unfair treatment'], ans: 0 },
+
+  // Teamwork (2)
+  { id: 15, skill: 'Teamwork', q: 'A teammate is struggling and might delay the deadline. What do you do?', opts: ['Let them handle it — it is their responsibility', 'Offer to help while ensuring your own tasks are done', 'Report them to the manager immediately', 'Complain to other team members'], ans: 1 },
+  { id: 16, skill: 'Teamwork', q: 'Two teammates have a conflict about approach. As the third member, what do you do?', opts: ['Stay out of it completely', 'Take sides with whoever you like more', 'Facilitate a discussion to find a mutually agreed solution', 'Escalate immediately to the manager'], ans: 2 },
+
+  // Leadership (2)
+  { id: 17, skill: 'Leadership', q: 'You are leading a project and the team is heading in the wrong direction. What do you do?', opts: ['Let the team continue and hope it works out', 'Do all the work yourself', 'Blame the team for the mistake', 'Call a meeting, explain the issue, and redirect with a clear plan'], ans: 3 },
+  { id: 18, skill: 'Leadership', q: 'A team member consistently misses deadlines. As leader, what is your first step?', opts: ['Have a private empathetic conversation to understand their challenges', 'Remove them from the project immediately', 'Ignore it and redistribute their work silently', 'Publicly call them out in the team meeting'], ans: 0 },
+
+  // Problem Solving (2)
+  { id: 19, skill: 'Problem Solving', q: 'You encounter a complex production bug you have never seen before. What is your approach?', opts: ['Panic and ask someone else to fix it', 'Randomly try different fixes', 'Restart the server and hope it goes away', 'Break it down, check logs, isolate variables, and research systematically'], ans: 3 },
+  { id: 20, skill: 'Problem Solving', q: 'You have a tight deadline but keep running into unexpected problems. What do you do?', opts: ['Assess, prioritize critical tasks, and communicate status to stakeholders', 'Work through the night alone without telling anyone', 'Give up and submit incomplete work', 'Blame the unclear requirements'], ans: 0 },
+
+  // Time Management (2)
+  { id: 21, skill: 'Time Management', q: 'You have three equally important tasks due the same day. How do you approach them?', opts: ['Do them in random order as you feel like', 'Ask for extensions on all three', 'Focus on the easiest one first to feel productive', 'Prioritize by urgency, create a schedule and stick to it'], ans: 3 },
+  { id: 22, skill: 'Time Management', q: 'Halfway through a project you realize you are behind schedule. What do you do?', opts: ['Rush through remaining tasks sacrificing quality', 'Inform stakeholders early, reassess, and identify ways to catch up', 'Pretend everything is on track', 'Abandon the project'], ans: 1 },
+
+  // Adaptability (2)
+  { id: 23, skill: 'Adaptability', q: 'Your manager changes project requirements significantly mid-way. How do you react?', opts: ['Refuse to accept changes and continue with the old plan', 'Acknowledge changes, adapt your plan, and communicate timeline impacts', 'Complain extensively about last-minute changes', 'Submit the original version anyway'], ans: 1 },
+  { id: 24, skill: 'Adaptability', q: 'You are assigned a project using technology you have never used before. What do you do?', opts: ['Tell your manager you cannot do it', 'Pretend you know it and figure it out without telling anyone', 'Use old technology regardless', 'Research it, find learning resources, and set realistic expectations'], ans: 3 },
 ]
 
-const SKILLS = ['JavaScript', 'React', 'Python', 'SQL', 'DSA', 'System Design']
+const TECH_SKILLS = ['JavaScript', 'React', 'Python', 'SQL', 'DSA', 'System Design']
+const SOFT_SKILLS = ['Communication', 'Teamwork', 'Leadership', 'Problem Solving', 'Time Management', 'Adaptability']
+const SKILLS = [...TECH_SKILLS, ...SOFT_SKILLS]
 
 export default function Assessment() {
-  const [phase, setPhase] = useState('intro') // intro | quiz | results
+  const [phase, setPhase] = useState('intro')
   const [current, setCurrent] = useState(0)
   const [answers, setAnswers] = useState({})
   const [selected, setSelected] = useState(null)
@@ -78,7 +86,7 @@ export default function Assessment() {
     const pct = Math.round((score / questions.length) * 100)
     const skillScores = SKILLS.map(s => {
       const qs = questions.filter(q => q.skill === s)
-      if (!qs.length) return { skill: s, score: Math.floor(Math.random() * 40) + 50 }
+      if (!qs.length) return { skill: s, score: 0 }
       const correct = qs.filter(q => answers[q.id] === q.ans).length
       return { skill: s, score: Math.round((correct / qs.length) * 100) }
     })
@@ -95,15 +103,25 @@ export default function Assessment() {
       <div className="card p-8 text-center">
         <div className="text-5xl mb-4">🧠</div>
         <h2 className="text-2xl font-black text-gray-900 mb-2">AI Skill Assessment</h2>
-        <p className="text-gray-500 mb-6">Answer {questions.length} questions across {SKILLS.length} skill areas. Our AI will analyze your responses and generate a personalized skill profile with gap analysis.</p>
-        <div className="grid grid-cols-3 gap-3 mb-8">
-          {[['⏱', '~20 min', 'Duration'], ['❓', `${questions.length} Qs`, 'Questions'], ['🎯', `${SKILLS.length} Skills`, 'Assessed']].map(([icon, val, label]) => (
+        <p className="text-gray-500 mb-6">Answer {questions.length} questions across {SKILLS.length} skill areas — both technical and soft skills. Our AI will generate a personalized profile with gap analysis.</p>
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {[['⏱', '~15 min', 'Duration'], ['❓', `${questions.length} Qs`, 'Questions'], ['🎯', `${SKILLS.length} Skills`, 'Assessed']].map(([icon, val, label]) => (
             <div key={label} className="bg-blue-50 rounded-xl p-3">
               <div className="text-xl">{icon}</div>
               <div className="font-black text-gray-900">{val}</div>
               <div className="text-xs text-gray-500">{label}</div>
             </div>
           ))}
+        </div>
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="bg-purple-50 rounded-xl p-3 text-left">
+            <div className="text-xs font-bold text-purple-700 mb-1">💻 Technical Skills</div>
+            {TECH_SKILLS.map(s => <div key={s} className="text-xs text-gray-600">• {s}</div>)}
+          </div>
+          <div className="bg-emerald-50 rounded-xl p-3 text-left">
+            <div className="text-xs font-bold text-emerald-700 mb-1">🤝 Soft Skills</div>
+            {SOFT_SKILLS.map(s => <div key={s} className="text-xs text-gray-600">• {s}</div>)}
+          </div>
         </div>
         <div className="text-left mb-6 space-y-2">
           {['No time limit per question', 'Results are added to your profile', 'Retake anytime to track progress'].map(t => (
@@ -119,13 +137,16 @@ export default function Assessment() {
 
   if (phase === 'quiz') {
     const q = questions[current]
-    const progress = ((current) / questions.length) * 100
+    const progress = (current / questions.length) * 100
+    const isSoft = SOFT_SKILLS.includes(q.skill)
     return (
       <div className="max-w-2xl mx-auto space-y-5">
         <div>
           <div className="flex justify-between text-sm text-gray-500 mb-2">
             <span>Question {current + 1} of {questions.length}</span>
-            <span className="badge bg-blue-50 text-blue-700">{q.skill}</span>
+            <span className={`badge ${isSoft ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}`}>
+              {isSoft ? '🤝' : '💻'} {q.skill}
+            </span>
           </div>
           <div className="bg-gray-100 rounded-full h-2">
             <div className="bg-gradient-to-r from-primary to-teal h-2 rounded-full transition-all duration-500" style={{ width: progress + '%' }} />
@@ -133,6 +154,7 @@ export default function Assessment() {
         </div>
 
         <div className="card p-6">
+          {isSoft && <div className="text-xs text-emerald-600 font-semibold mb-3">🤝 Soft Skill — Choose the best response</div>}
           <h3 className="text-lg font-bold text-gray-900 mb-6">{q.q}</h3>
           <div className="space-y-3">
             {q.opts.map((opt, i) => {
@@ -150,7 +172,7 @@ export default function Assessment() {
           </div>
           {selected !== null && (
             <div className={`mt-4 p-3 rounded-xl text-sm ${selected === q.ans ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}`}>
-              {selected === q.ans ? '✅ Correct!' : `❌ Correct answer: ${q.opts[q.ans]}`}
+              {selected === q.ans ? '✅ Great choice!' : `❌ Best answer: ${q.opts[q.ans]}`}
             </div>
           )}
         </div>
@@ -163,46 +185,69 @@ export default function Assessment() {
     )
   }
 
-  if (phase === 'results') return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="card p-8 text-center">
-        <div className="text-5xl mb-3">{results.score >= 70 ? '🏆' : results.score >= 50 ? '📈' : '💪'}</div>
-        <h2 className="text-2xl font-black text-gray-900 mb-1">Assessment Complete!</h2>
-        <p className="text-gray-500 mb-4">{results.correct} of {results.total} correct answers</p>
-        <div className="inline-flex items-center justify-center w-28 h-28 rounded-full bg-gradient-to-br from-primary to-teal text-white mb-4">
-          <div>
-            <div className="text-4xl font-black">{results.score}</div>
-            <div className="text-xs opacity-80">/ 100</div>
+  if (phase === 'results') {
+    const techScores = results.skillScores.filter(s => TECH_SKILLS.includes(s.skill))
+    const softScores = results.skillScores.filter(s => SOFT_SKILLS.includes(s.skill))
+    return (
+      <div className="max-w-2xl mx-auto space-y-6">
+        <div className="card p-8 text-center">
+          <div className="text-5xl mb-3">{results.score >= 70 ? '🏆' : results.score >= 50 ? '📈' : '💪'}</div>
+          <h2 className="text-2xl font-black text-gray-900 mb-1">Assessment Complete!</h2>
+          <p className="text-gray-500 mb-4">{results.correct} of {results.total} correct answers</p>
+          <div className="inline-flex items-center justify-center w-28 h-28 rounded-full bg-gradient-to-br from-primary to-teal text-white mb-4">
+            <div>
+              <div className="text-4xl font-black">{results.score}</div>
+              <div className="text-xs opacity-80">/ 100</div>
+            </div>
+          </div>
+          <div className="text-sm text-gray-500">
+            {results.score >= 70 ? 'Excellent! Your skill profile is strong.' : results.score >= 50 ? 'Good progress! Keep building.' : 'Focus on the gap areas below to improve.'}
           </div>
         </div>
-        <div className="text-sm text-gray-500">
-          {results.score >= 70 ? 'Excellent! Your skill profile is strong.' : results.score >= 50 ? 'Good progress! Keep building.' : 'Focus on the gap areas below to improve.'}
+
+        <div className="card p-6">
+          <h3 className="font-bold text-gray-900 mb-4">💻 Technical Skills</h3>
+          <div className="space-y-4">
+            {techScores.map(({ skill, score }) => (
+              <div key={skill}>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-medium text-gray-700">{skill}</span>
+                  <span className="font-bold text-gray-900">{score}%</span>
+                </div>
+                <div className="bg-gray-100 rounded-full h-2.5">
+                  <div className={`h-2.5 rounded-full transition-all ${score >= 70 ? 'bg-emerald-500' : score >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
+                    style={{ width: score + '%' }} />
+                </div>
+                {score < 60 && <p className="text-xs text-red-500 mt-1">⚠ Skill gap detected — consider focused practice</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="card p-6">
+          <h3 className="font-bold text-gray-900 mb-4">🤝 Soft Skills</h3>
+          <div className="space-y-4">
+            {softScores.map(({ skill, score }) => (
+              <div key={skill}>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-medium text-gray-700">{skill}</span>
+                  <span className="font-bold text-gray-900">{score}%</span>
+                </div>
+                <div className="bg-gray-100 rounded-full h-2.5">
+                  <div className={`h-2.5 rounded-full transition-all ${score >= 70 ? 'bg-emerald-500' : score >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
+                    style={{ width: score + '%' }} />
+                </div>
+                {score < 60 && <p className="text-xs text-red-500 mt-1">⚠ Area for improvement — practice in real team settings</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <button onClick={() => { setPhase('intro'); setCurrent(0); setAnswers({}); setSelected(null) }} className="btn-outline py-3">Retake Assessment</button>
+          <button onClick={() => window.location.href = '/internships'} className="btn-primary py-3">Find Internships →</button>
         </div>
       </div>
-
-      <div className="card p-6">
-        <h3 className="font-bold text-gray-900 mb-4">Skill Breakdown</h3>
-        <div className="space-y-4">
-          {results.skillScores.map(({ skill, score }) => (
-            <div key={skill}>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="font-medium text-gray-700">{skill}</span>
-                <span className="font-bold text-gray-900">{score}%</span>
-              </div>
-              <div className="bg-gray-100 rounded-full h-2.5">
-                <div className={`h-2.5 rounded-full transition-all ${score >= 70 ? 'bg-emerald-500' : score >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
-                  style={{ width: score + '%' }} />
-              </div>
-              {score < 60 && <p className="text-xs text-red-500 mt-1">⚠ Skill gap detected — consider focused practice</p>}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <button onClick={() => { setPhase('intro'); setCurrent(0); setAnswers({}); setSelected(null) }} className="btn-outline py-3">Retake Assessment</button>
-        <button onClick={() => window.location.href = '/internships'} className="btn-primary py-3">Find Internships →</button>
-      </div>
-    </div>
-  )
+    )
+  }
 }

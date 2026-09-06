@@ -64,35 +64,45 @@ router.get('/jobs-feed', auth, async (req, res) => {
     const user = await db.users.findOne({ _id: req.user.id })
     const userSkills = (user.skills || []).join(' ') || 'software engineer'
     const keyword = req.query.q || userSkills || 'software developer'
+    const location = req.query.location || 'india'
 
-    return res.json({
-      jobs: getFallbackJobs(keyword),
-      source: 'demo',
-      message: 'Showing curated job listings.'
-    })
+    const appId = process.env.ADZUNA_APP_ID
+    const appKey = process.env.ADZUNA_APP_KEY
+
+    if (!appId || !appKey) {
+      return res.json({ jobs: getFallbackJobs(keyword), source: 'demo', message: 'Add ADZUNA_APP_ID and ADZUNA_APP_KEY to .env for live jobs' })
+    }
+
+    const url = `https://api.adzuna.com/v1/api/jobs/in/search/1?app_id=${appId}&app_key=${appKey}&results_per_page=20&what=${encodeURIComponent(keyword)}&where=${encodeURIComponent(location)}&content-type=application/json`
+
+    https.get(url, (apiRes) => {
+      let data = ''
+      apiRes.on('data', chunk => data += chunk)
+      apiRes.on('end', () => {
+        try {
+          const parsed = JSON.parse(data)
+          const jobs = (parsed.results || []).map(j => ({
+            _id: j.id,
+            title: j.title,
+            company: j.company?.display_name || 'Company',
+            location: j.location?.display_name || location,
+            compensation: j.salary_min ? `₹${Math.round(j.salary_min/100000)}–${Math.round(j.salary_max/100000)} LPA` : 'Competitive',
+            duration: 'Permanent',
+            skills: keyword.split(' ').slice(0, 3),
+            match: Math.min(95, Math.floor((user?.skillScore || 30) + (Math.random() * 10 - 5))),
+            logo: '💼',
+            type: j.contract_time === 'part_time' ? 'Part-time' : 'Full-time',
+            category: j.contract_type === 'permanent' || !j.contract_type ? 'job' : 'internship',
+            url: j.redirect_url,
+            description: j.description?.slice(0, 200)
+          }))
+          res.json({ jobs, source: 'adzuna', total: parsed.count })
+        } catch { res.json({ jobs: getFallbackJobs(keyword), source: 'demo' }) }
+      })
+    }).on('error', () => res.json({ jobs: getFallbackJobs(keyword), source: 'demo' }))
+
   } catch (e) { res.status(500).json({ error: e.message }) }
 })
-
-function getFallbackJobs(keyword) {
-  const all = [
-    { _id: 'f1', title: 'Software Engineer', company: 'Google', location: 'Bangalore', compensation: '₹28–45 LPA', duration: 'Permanent', skills: ['DSA', 'System Design', 'Python'], match: 94, logo: '🌐', type: 'Full-time', category: 'job' },
-    { _id: 'f2', title: 'Frontend Developer', company: 'Flipkart', location: 'Bangalore', compensation: '₹18–28 LPA', duration: 'Permanent', skills: ['React', 'TypeScript', 'CSS'], match: 88, logo: '🛒', type: 'Remote', category: 'job' },
-    { _id: 'f3', title: 'ML Engineer', company: 'Microsoft', location: 'Hyderabad', compensation: '₹24–36 LPA', duration: 'Permanent', skills: ['Python', 'PyTorch', 'MLOps'], match: 82, logo: '💻', type: 'Hybrid', category: 'job' },
-    { _id: 'f4', title: 'Backend Engineer', company: 'Amazon', location: 'Chennai', compensation: '₹22–32 LPA', duration: 'Permanent', skills: ['Java', 'AWS', 'Microservices'], match: 78, logo: '📦', type: 'Full-time', category: 'job' },
-    { _id: 'f5', title: 'Data Scientist', company: 'Walmart Labs', location: 'Bangalore', compensation: '₹20–30 LPA', duration: 'Permanent', skills: ['Python', 'ML', 'SQL'], match: 75, logo: '🏪', type: 'Hybrid', category: 'job' },
-    { _id: 'f6', title: 'DevOps Engineer', company: 'PhonePe', location: 'Bangalore', compensation: '₹18–25 LPA', duration: 'Permanent', skills: ['AWS', 'Docker', 'CI/CD'], match: 72, logo: '💳', type: 'Full-time', category: 'job' },
-    { _id: 'f7', title: 'Software Engineer Intern', company: 'Google', location: 'Bangalore', compensation: 'Stipend: ₹80,000/mo', duration: '3 months', skills: ['Python', 'Algorithms'], match: 91, logo: '🌐', type: 'Remote', category: 'internship' },
-    { _id: 'f8', title: 'ML Research Intern', company: 'Microsoft', location: 'Hyderabad', compensation: 'Stipend: ₹70,000/mo', duration: '3 months', skills: ['Python', 'NLP', 'PyTorch'], match: 85, logo: '💻', type: 'Hybrid', category: 'internship' },
-    { _id: 'f9', title: 'Frontend Intern', company: 'Swiggy', location: 'Bangalore', compensation: 'Stipend: ₹45,000/mo', duration: '3 months', skills: ['React', 'JavaScript'], match: 80, logo: '🍔', type: 'Remote', category: 'internship' },
-    { _id: 'f10', title: 'Backend Intern', company: 'Razorpay', location: 'Bangalore', compensation: 'Stipend: ₹50,000/mo', duration: '4 months', skills: ['Node.js', 'AWS', 'SQL'], match: 76, logo: '💳', type: 'Full-time', category: 'internship' },
-    { _id: 'f11', title: 'Cybersecurity Analyst', company: 'TCS', location: 'Pune', compensation: '₹12–18 LPA', duration: 'Permanent', skills: ['Security', 'Networking', 'Linux'], match: 68, logo: '🔐', type: 'Full-time', category: 'job' },
-    { _id: 'f12', title: 'Full Stack Developer', company: 'Freshworks', location: 'Chennai', compensation: '₹15–22 LPA', duration: 'Permanent', skills: ['React', 'Node.js', 'PostgreSQL'], match: 85, logo: '🌿', type: 'Hybrid', category: 'job' },
-    { _id: 'f13', title: 'AI/ML Intern', company: 'ISRO', location: 'Ahmedabad', compensation: 'Unpaid', duration: '2 months', skills: ['Python', 'TensorFlow'], match: 60, logo: '🚀', type: 'Full-time', category: 'internship' },
-    { _id: 'f14', title: 'Android Developer', company: 'CRED', location: 'Bangalore', compensation: '₹16–24 LPA', duration: 'Permanent', skills: ['Kotlin', 'Android', 'Firebase'], match: 74, logo: '📱', type: 'Full-time', category: 'job' },
-    { _id: 'f15', title: 'UI/UX Designer', company: 'Zomato', location: 'Gurugram', compensation: '₹12–18 LPA', duration: 'Permanent', skills: ['Figma', 'Adobe XD', 'Prototyping'], match: 70, logo: '🎨', type: 'Hybrid', category: 'job' },
-  ]
-  return all
-}
 
 // Apply for internship
 router.post('/apply/:id', auth, async (req, res) => {
