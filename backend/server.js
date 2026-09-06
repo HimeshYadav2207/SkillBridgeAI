@@ -11,7 +11,10 @@ if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true })
 
 const app = express()
 
-app.use(cors())
+app.use(cors({
+  origin: ['https://skill-bridge-ai-mu.vercel.app', 'http://localhost:5173'],
+  credentials: true
+}))
 app.use(express.json())
 
 // Routes
