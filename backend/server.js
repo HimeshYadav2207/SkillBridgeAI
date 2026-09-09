@@ -3,6 +3,10 @@ const express = require('express')
 const cors = require('cors')
 const path = require('path')
 const fs = require('fs')
+
+// Change to backend directory if running from root
+process.chdir(__dirname)
+
 const seed = require('./seed')
 
 // Ensure the data directory exists before NeDB tries to use it
