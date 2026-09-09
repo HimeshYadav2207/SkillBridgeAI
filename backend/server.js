@@ -29,7 +29,7 @@ app.use('/api/ai', require('./routes/ai'))
 app.get('/api/health', (_, res) => res.json({ status: 'ok', version: '2.0.0', timestamp: new Date() }))
 
 const PORT = process.env.PORT || 5000
-app.listen(PORT, async () => {
+app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 SkillBridge API running on http://localhost:${PORT}`)
   await seed()
 })
